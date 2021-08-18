@@ -1,0 +1,59 @@
+---
+# Source: istio/templates/gateway.yaml
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: ingress-gateway-configuration
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - "fleetman-webapp.tiki.nimtechnology.com"
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+---
+# Source: istio/templates/virtualservice.yaml
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: fleetman-webapp
+  namespace: default
+spec:
+  gateways:
+    - "ingress-gateway-configuration"
+  hosts:
+    - "fleetman-webapp.tiki.nimtechnology.com"
+  http:
+    - name: fleetman-webapp.tiki.nimtechnology.com
+      match:
+      - headers:  # IF
+          x-my-header:
+            exact: canary
+      route: # THEN
+      - destination:
+          host: fleetman-webapp
+          subset: experimental
+    - route: # CATCH ALL
+      - destination:
+          host: fleetman-webapp
+          subset: original
+
+---
+# Source: istio/templates/virtualservice.yaml
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: fleetman-webapp
+  namespace: default
+spec:
+  host: fleetman-webapp
+  subsets:
+    - labels:
+        version: original
+      name: original
+    - labels:
+        version: experimental
+      name: experimental
