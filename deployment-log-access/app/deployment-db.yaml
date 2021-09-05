@@ -1,0 +1,78 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-demo-8-db
+  labels:
+    app: go-demo-8-db
+    release: primary
+spec:
+  selector:
+    matchLabels:
+      app: go-demo-8-db
+      release: primary
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: go-demo-8-db
+        release: primary
+    spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+      tolerations:
+      - key: "node"
+        operator: "Equal"
+        value: "storage-ssd"
+        effect: "NoSchedule"
+      nodeSelector:
+        node: "storage-ssd"
+      containers:
+      - name: go-demo-8-db
+        image: docker.io/bitnami/mongodb:4.0.3
+        imagePullPolicy: "Always"
+        env:
+        - name: MONGODB_SYSTEM_LOG_VERBOSITY
+          value: "0"
+        - name: MONGODB_DISABLE_SYSTEM_LOG
+          value: "no"
+        - name: MONGODB_ENABLE_IPV6
+          value: "yes"
+        ports:
+        - name: mongodb
+          containerPort: 27017
+        livenessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 6
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/mongodb
+        resources:
+          {}
+          
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: go-demo-8-db
