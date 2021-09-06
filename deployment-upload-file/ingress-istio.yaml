@@ -9,7 +9,7 @@ spec:
     istio: ingressgateway
   servers:
     - hosts:
-        - "fleetman-webapp.nimtechnology.com"
+        - fleetman-webapp.nimtechnology.com
       port:
         name: http
         number: 80
@@ -23,9 +23,9 @@ metadata:
   namespace: default
 spec:
   gateways:
-    - "ingress-gateway-configuration"
+    - ingress-gateway-configuration
   hosts:
-    - "fleetman-webapp.nimtechnology.com"
+    - fleetman-webapp.nimtechnology.com
   http:
     - name: fleetman-webapp.nimtechnology.com
       match:

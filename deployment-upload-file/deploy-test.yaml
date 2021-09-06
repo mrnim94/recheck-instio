@@ -16,10 +16,18 @@ spec:
     spec:
       containers:
       - name: upload
-        image: adrianlzt/docker-nginx-php-upload
+        image: docker.nimtechnology.com/dockerhub/adrianlzt/docker-nginx-php-upload
         resources:
           limits:
             memory: "128Mi"
             cpu: "100m"
         ports:
         - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
