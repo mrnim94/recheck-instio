@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-httpbin-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin-1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: httpbin-1
+    spec:
+      containers:
+      - name: httpbin-1
+        image: docker.nimtechnology.com/dockerhub/kennethreitz/httpbin
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /status/200
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /status/200
+            port: 80

@@ -1,0 +1,27 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: author-default
+  namespace: default
+spec:
+  selector:
+   matchLabels:
+     app: httpbin
+  action: ALLOW
+  rules:
+  - from: 
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+        namespaces: ["istio-system"]
+    - source:
+        principals: ["cluster.local/ns/default/sa/busybox-sa"]
+        namespaces: ["default","go-demo-8"]
+    
+    - source:
+        principals: ["cluster.local/ns/sample/sa/busybox-sa"]
+        namespaces: ["sample"]
+    
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/ip","/status*"]

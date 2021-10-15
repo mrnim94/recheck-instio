@@ -1,0 +1,38 @@
+---
+# Source: istio/templates/gateway.yaml
+kind: Gateway
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: ingress-gateway-httpbin-1
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - fleetman-webapp-1.nimtechnology.com
+      port:
+        name: http
+        number: 80
+        protocol: HTTP
+---
+# Source: istio/templates/virtualservice.yaml
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: fleetman-webapp-httpbin-1
+  namespace: default
+spec:
+  gateways:
+    - ingress-gateway-httpbin-1
+  hosts:
+    - fleetman-webapp-1.nimtechnology.com
+  http:
+    - name: fleetman-webapp-1.nimtechnology.com
+      match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: httpbin-1
+            port:
+              number: 80

@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  #- author-default.yaml
+  #- author-default-1.yaml
+  - pa-default.yaml
+  #- author-ingress-gateway-1.yaml
+  - req-authen-ingressgateway-jwt.yaml
+  - author-ingress-gateway.yaml
+  - se-fleetman-webapp.yaml
+  - author-ingress-gateway-jwt.yaml
+  - author-ingress-gateway-attribute.yaml
