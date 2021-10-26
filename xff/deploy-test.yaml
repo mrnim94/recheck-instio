@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-xff
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xff
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: xff
+    spec:
+      containers:
+      - name: xff
+        image: docker.nimtechnology.com/dockerhub/kennethreitz/httpbin
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /status/200
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /status/200
+            port: 80
